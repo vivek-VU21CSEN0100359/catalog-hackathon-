@@ -1,0 +1,66 @@
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Welcome to the Crop and Soil Management System!");
+
+        cropSelection(scanner);
+
+        soilManagement(scanner);
+
+        diseaseIdentification(scanner);
+
+        System.out.println("Thank you for using the Crop and Soil Management System!");
+        scanner.close();
+    }
+
+    public static void cropSelection(Scanner scanner) {
+        System.out.println("=== Crop Selection ===");
+        System.out.println("Enter soil type (e.g., Sandy, Clay, Loamy): ");
+        String soilType = scanner.nextLine();
+        System.out.println("Enter climate (e.g., Arid, Tropical, Temperate): ");
+        String climate = scanner.nextLine();
+
+        if ("Sandy".equalsIgnoreCase(soilType) && "Arid".equalsIgnoreCase(climate)) {
+            System.out.println("Recommended Crop: Millet, Sorghum");
+        } else if ("Clay".equalsIgnoreCase(soilType) && "Tropical".equalsIgnoreCase(climate)) {
+            System.out.println("Recommended Crop: Rice, Sugarcane");
+        } else if ("Loamy".equalsIgnoreCase(soilType) && "Temperate".equalsIgnoreCase(climate)) {
+            System.out.println("Recommended Crop: Wheat, Barley");
+        } else {
+            System.out.println("Please consult a local expert for crop selection.");
+        }
+    }
+
+    public static void soilManagement(Scanner scanner) {
+        System.out.println("=== Soil Management ===");
+        System.out.println("Enter current soil condition (e.g., Low pH, Nutrient Deficient): ");
+        String soilCondition = scanner.nextLine();
+
+        if ("Low pH".equalsIgnoreCase(soilCondition)) {
+            System.out.println("Suggestion: Apply lime to increase soil pH.");
+        } else if ("Nutrient Deficient".equalsIgnoreCase(soilCondition)) {
+            System.out.println("Suggestion: Apply organic compost or fertilizer.");
+        } else {
+            System.out.println("Please consult a soil expert for management suggestions.");
+        }
+    }
+
+    public static void diseaseIdentification(Scanner scanner) {
+        System.out.println("=== Disease Identification ===");
+        System.out.println("Enter visible symptoms (e.g., Yellow Leaves, Wilting): ");
+        String symptoms = scanner.nextLine();
+
+        if ("Yellow Leaves".equalsIgnoreCase(symptoms)) {
+            System.out.println("Possible Disease: Nitrogen Deficiency.");
+            System.out.println("Suggestion: Apply nitrogen-rich fertilizer.");
+        } else if ("Wilting".equalsIgnoreCase(symptoms)) {
+            System.out.println("Possible Disease: Fusarium Wilt.");
+            System.out.println("Suggestion: Use resistant crop varieties, improve soil drainage.");
+        } else {
+            System.out.println("Please consult an agricultural expert for disease diagnosis.");
+        }
+    }
+}
