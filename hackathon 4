@@ -1,0 +1,126 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// Main class containing the entry point of the program
+public class Main {
+
+    // Class representing a transaction in the supply chain
+    static class Transaction {
+        private String transactionId;
+        private String drugId;
+        private String from;
+        private String to;
+        private String timestamp;
+        private String status;
+
+        public Transaction(String transactionId, String drugId, String from, String to, String timestamp, String status) {
+            this.transactionId = transactionId;
+            this.drugId = drugId;
+            this.from = from;
+            this.to = to;
+            this.timestamp = timestamp;
+            this.status = status;
+        }
+
+        // Getters
+        public String getTransactionId() {
+            return transactionId;
+        }
+
+        public String getDrugId() {
+            return drugId;
+        }
+
+        public String getFrom() {
+            return from;
+        }
+
+        public String getTo() {
+            return to;
+        }
+
+        public String getTimestamp() {
+            return timestamp;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
+
+    // Class representing a smart contract for the pharma supply chain
+    static class SmartContract {
+        private List<Transaction> transactions;
+
+        public SmartContract() {
+            this.transactions = new ArrayList<>();
+        }
+
+        public void addTransaction(Transaction transaction) {
+            transactions.add(transaction);
+            System.out.println("Transaction added: " + transaction.getTransactionId());
+        }
+
+        public List<Transaction> getAllTransactions() {
+            return transactions;
+        }
+
+        public Transaction getTransactionById(String transactionId) {
+            for (Transaction transaction : transactions) {
+                if (transaction.getTransactionId().equals(transactionId)) {
+                    return transaction;
+                }
+            }
+            return null;
+        }
+
+        public void verifyTransaction(String transactionId) {
+            Transaction transaction = getTransactionById(transactionId);
+            if (transaction != null) {
+                System.out.println("Verifying transaction: " + transactionId);
+                System.out.println("Transaction details:");
+                System.out.println("Drug ID: " + transaction.getDrugId());
+                System.out.println("From: " + transaction.getFrom());
+                System.out.println("To: " + transaction.getTo());
+                System.out.println("Timestamp: " + transaction.getTimestamp());
+                System.out.println("Status: " + transaction.getStatus());
+                // Here, additional logic could be implemented to verify the authenticity of the transaction
+            } else {
+                System.out.println("Transaction not found.");
+            }
+        }
+    }
+
+    // Main method to simulate the pharma supply chain system
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        SmartContract smartContract = new SmartContract();
+
+        // Input transaction details from user
+        System.out.println("Enter transaction ID:");
+        String transactionId = scanner.nextLine();
+        System.out.println("Enter drug ID:");
+        String drugId = scanner.nextLine();
+        System.out.println("Enter sender (from):");
+        String from = scanner.nextLine();
+        System.out.println("Enter receiver (to):");
+        String to = scanner.nextLine();
+        System.out.println("Enter timestamp:");
+        String timestamp = scanner.nextLine();
+        System.out.println("Enter status:");
+        String status = scanner.nextLine();
+
+        // Create a new transaction and add it to the smart contract
+        Transaction transaction = new Transaction(transactionId, drugId, from, to, timestamp, status);
+        smartContract.addTransaction(transaction);
+
+        // Verify the transaction
+        System.out.println("Enter transaction ID to verify:");
+        String verifyTransactionId = scanner.nextLine();
+        smartContract.verifyTransaction(verifyTransactionId);
+
+        scanner.close();
+    }
+}
