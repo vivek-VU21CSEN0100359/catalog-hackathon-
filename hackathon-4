@@ -1,0 +1,147 @@
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
+
+public class Main {
+
+    private static List<Vaccine> vaccines = new ArrayList<>();
+    private static List<Appointment> appointments = new ArrayList<>();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        // Sample vaccine data
+        vaccines.add(new Vaccine("MMR", "Age 1 year"));
+        vaccines.add(new Vaccine("DTP", "Age 2 months, 4 months, 6 months"));
+        vaccines.add(new Vaccine("Polio", "Age 2 months, 4 months, 6 months"));
+
+        while (true) {
+            System.out.println("Vaccination Management System");
+            System.out.println("1. Schedule Appointment");
+            System.out.println("2. View Appointments");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+            int choice = -1;
+            try {
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine(); // Clear the buffer
+                continue;
+            }
+
+            switch (choice) {
+                case 1:
+                    scheduleAppointment();
+                    break;
+                case 2:
+                    viewAppointments();
+                    break;
+                case 3:
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void scheduleAppointment() {
+        System.out.print("Enter child's name: ");
+        String childName = scanner.nextLine();
+        System.out.println("Available Vaccines:");
+        for (int i = 0; i < vaccines.size(); i++) {
+            System.out.println((i + 1) + ". " + vaccines.get(i));
+        }
+        System.out.print("Choose a vaccine by number: ");
+        int vaccineChoice = -1;
+        try {
+            vaccineChoice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            scanner.nextLine(); // Clear the buffer
+            return;
+        }
+        if (vaccineChoice < 1 || vaccineChoice > vaccines.size()) {
+            System.out.println("Invalid vaccine choice.");
+            return;
+        }
+        Vaccine chosenVaccine = vaccines.get(vaccineChoice - 1);
+        System.out.print("Enter appointment date (YYYY-MM-DD): ");
+        LocalDate date;
+        try {
+            date = LocalDate.parse(scanner.nextLine());
+        } catch (Exception e) {
+            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+        }
+
+        Appointment appointment = new Appointment(childName, chosenVaccine, date);
+        appointments.add(appointment);
+        System.out.println("Appointment scheduled successfully!");
+    }
+
+    private static void viewAppointments() {
+        if (appointments.isEmpty()) {
+            System.out.println("No appointments found.");
+        } else {
+            System.out.println("Scheduled Appointments:");
+            for (Appointment appointment : appointments) {
+                System.out.println(appointment);
+            }
+        }
+    }
+
+    static class Vaccine {
+        private String name;
+        private String schedule;
+
+        public Vaccine(String name, String schedule) {
+            this.name = name;
+            this.schedule = schedule;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getSchedule() {
+            return schedule;
+        }
+
+        @Override
+        public String toString() {
+            return name + " - " + schedule;
+        }
+    }
+
+    static class Appointment {
+        private String childName;
+        private Vaccine vaccine;
+        private LocalDate date;
+
+        public Appointment(String childName, Vaccine vaccine, LocalDate date) {
+            this.childName = childName;
+            this.vaccine = vaccine;
+            this.date = date;
+        }
+
+        public String getChildName() {
+            return childName;
+        }
+
+        public Vaccine getVaccine() {
+            return vaccine;
+        }
+
+        public LocalDate getDate() {
+            return date;
+        }
+
+        @Override
+        public String toString() {
+            return childName + " - " + vaccine + " on " + date;
+        }
+    }
+}
