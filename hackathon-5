@@ -1,0 +1,144 @@
+import java.security.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.UUID; // Importing UUID class
+import javax.crypto.Cipher;
+
+public class Main {
+
+    // Class representing a Voter
+    static class Voter {
+        private String voterId;
+        private String hashedPassword;
+
+        public Voter(String voterId, String password) {
+            this.voterId = voterId;
+            this.hashedPassword = hashPassword(password);
+        }
+
+        // Hash the password using SHA-256 for secure storage
+        private String hashPassword(String password) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hash = md.digest(password.getBytes());
+                return Base64.getEncoder().encodeToString(hash);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Authenticate voter based on the provided password
+        public boolean authenticate(String password) {
+            return hashedPassword.equals(hashPassword(password));
+        }
+
+        public String getVoterId() {
+            return voterId;
+        }
+    }
+
+    // Class representing a Vote
+    static class Vote {
+        private String encryptedVote;
+        private String voteId;
+
+        public Vote(String vote, PublicKey publicKey) {
+            this.encryptedVote = encryptVote(vote, publicKey);
+            this.voteId = UUID.randomUUID().toString(); // Unique ID for each vote
+        }
+
+        // Encrypt the vote using the public key
+        private String encryptVote(String vote, PublicKey publicKey) {
+            try {
+                Cipher cipher = Cipher.getInstance("RSA");
+                cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+                byte[] encryptedBytes = cipher.doFinal(vote.getBytes());
+                return Base64.getEncoder().encodeToString(encryptedBytes);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public String getEncryptedVote() {
+            return encryptedVote;
+        }
+
+        public String getVoteId() {
+            return voteId;
+        }
+    }
+
+    // Class representing the Voting System
+    static class VotingSystem {
+        private Map<String, Vote> voteStorage = new HashMap<>();
+
+        // Cast a vote by storing the encrypted vote
+        public void castVote(Vote vote) {
+            voteStorage.put(vote.getVoteId(), vote);
+        }
+
+        // Count and decrypt votes using the private key
+        public void countVotes(PrivateKey privateKey) {
+            for (Vote vote : voteStorage.values()) {
+                String decryptedVote = decryptVote(vote.getEncryptedVote(), privateKey);
+                System.out.println("Decrypted Vote: " + decryptedVote);
+            }
+        }
+
+        // Decrypt the vote using the private key
+        private String decryptVote(String encryptedVote, PrivateKey privateKey) {
+            try {
+                Cipher cipher = Cipher.getInstance("RSA");
+                cipher.init(Cipher.DECRYPT_MODE, privateKey);
+                byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedVote));
+                return new String(decryptedBytes);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+
+        // Generate RSA key pair for encryption and decryption
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
+        KeyPair keyPair = keyGen.generateKeyPair();
+
+        // Input Voter ID and Password
+        System.out.print("Enter Voter ID: ");
+        String voterId = scanner.nextLine();
+        System.out.print("Enter Password: ");
+        String password = scanner.nextLine();
+
+        // Create a voter and authenticate
+        Voter voter = new Voter(voterId, password);
+        System.out.print("Enter Password again to authenticate: ");
+        String authPassword = scanner.nextLine();
+
+        if (voter.authenticate(authPassword)) {
+            System.out.println("Voter authenticated!");
+
+            // Input Vote
+            System.out.print("Enter your vote: ");
+            String voteInput = scanner.nextLine();
+
+            // Create a voting system
+            VotingSystem votingSystem = new VotingSystem();
+
+            // Cast a vote
+            Vote vote = new Vote(voteInput, keyPair.getPublic());
+            votingSystem.castVote(vote);
+
+            // Count the votes (decrypt and print them)
+            votingSystem.countVotes(keyPair.getPrivate());
+        } else {
+            System.out.println("Authentication failed!");
+        }
+
+        scanner.close();
+    }
+}
